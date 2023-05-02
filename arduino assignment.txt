@@ -1,0 +1,81 @@
+int pirPin = 2; // PIR sensor input
+int gasPin = 3; // Gas sensor input
+int ledPin = 13; // LED output
+int buzzerPin = 8; // Buzzer output
+
+void setup() {
+  pinMode(pirPin, INPUT); // PIR sensor input
+  pinMode(gasPin, INPUT); // Gas sensor input
+  pinMode(ledPin, OUTPUT); // LED output
+  pinMode(buzzerPin, OUTPUT); // Buzzer output
+}
+
+void loop() {
+  int pirState = digitalRead(pirPin); // Read PIR sensor state
+  int gasState = digitalRead(gasPin); // Read Gas sensor state
+
+  if (pirState == HIGH && gasState == LOW) { // If PIR detects movement and no gas is detected
+    digitalWrite(ledPin, HIGH); // Turn on LED
+    tone(buzzerPin, 500); // Start buzzer
+    delay(1000); // Wait for 1 second
+    noTone(buzzerPin); // Stop buzzer
+  } else { // If no movement or gas detected
+    digitalWrite(ledPin, LOW); // Turn off LED
+    noTone(buzzerPin); // Stop buzzer
+  }
+}
+---------------------------------------------------------------------------// Smart Home with DHT11 Temperature & Humidity Sensor, PIR Motion Sensor, LED and Buzzer
+// Arduino code for Wokwi simulation
+
+#include <dht.h>
+
+#define DHTPIN 2          // DHT11 data pin
+#define PIRPIN 3          // PIR motion sensor pin
+#define LEDPIN 4          // LED pin
+#define BUZZERPIN 5       // Buzzer pin
+#define TEMPERATURE_THRESHOLD 25.0    // Temperature threshold for LED and Buzzer to turn on
+#define HUMIDITY_THRESHOLD 50         // Humidity threshold for LED and Buzzer to turn on
+
+dht DHT;
+
+void setup() {
+  pinMode(PIRPIN, INPUT);
+  pinMode(LEDPIN, OUTPUT);
+  pinMode(BUZZERPIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int pirState = digitalRead(PIRPIN);
+  if (pirState == HIGH) {
+    digitalWrite(LEDPIN, HIGH);
+    tone(BUZZERPIN, 2000);
+    delay(1000);
+    noTone(BUZZERPIN);
+    delay(500);
+  } else {
+    digitalWrite(LEDPIN, LOW);
+    noTone(BUZZERPIN);
+  }
+
+  int chk = DHT.read11(DHTPIN);
+  float temp = DHT.temperature;
+  float hum = DHT.humidity;
+  Serial.print("Temperature: ");
+  Serial.print(temp);
+  Serial.print(" C, Humidity: ");
+  Serial.print(hum);
+  Serial.print("%");
+  if (temp > TEMPERATURE_THRESHOLD || hum > HUMIDITY_THRESHOLD) {
+    digitalWrite(LEDPIN, HIGH);
+    tone(BUZZERPIN, 2000);
+    delay(1000);
+    noTone(BUZZERPIN);
+  } else {
+    digitalWrite(LEDPIN, LOW);
+    noTone(BUZZERPIN);
+  }
+
+  delay(1000);
+}
+
